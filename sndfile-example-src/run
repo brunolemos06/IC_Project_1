@@ -1,1 +1,0 @@
- ../sndfile-example-bin/wav_hist sample.wav 0 > x && xdg-open x
