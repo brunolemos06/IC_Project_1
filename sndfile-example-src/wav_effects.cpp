@@ -9,7 +9,7 @@ constexpr size_t FRAMES_BUFFER_SIZE = 65536; // Buffer for reading/writing frame
 int main(int argc, char *argv[]) {
 
     if(argc < 3) {
-		cerr << "Usage: wav_cmp <orignal filename> <compressed filename>" << endl;
+		cerr << "Usage: wav_effects <orignal filename> <compressed filename>" << endl;
 		return 1;
 	}
 
@@ -41,11 +41,13 @@ int main(int argc, char *argv[]) {
 
     double D = 0;
     double S = 0;
+
     size_t nFrames;
     vector<short> OGsamples(FRAMES_BUFFER_SIZE * sfhInOG.channels());
     while((nFrames = sfhInOG.readf(OGsamples.data(), FRAMES_BUFFER_SIZE))) {
         OGsamples.resize(nFrames * sfhInOG.channels());
     }
+
     // VARS 
     double Ex = 0;
     double Er = 0;
@@ -53,13 +55,7 @@ int main(int argc, char *argv[]) {
     vector<short> C0samples(FRAMES_BUFFER_SIZE * sfhInCO.channels());
     while((nFrames = sfhInCO.readf(C0samples.data(), FRAMES_BUFFER_SIZE))) {
         C0samples.resize(nFrames * sfhInCO.channels());
-        for(int j=0;j<N; j++){
-            if(j%2==0){
-                Ex = Ex + OGsamples[j]*OGsamples[j];
-                Er = Er + C0samples[j]*C0samples[j];
-            }
-        }
-        SNR = 10 * log10((double)(Ex/Er));        
+        cout << nFrames << endl;
     }
 	
 	
