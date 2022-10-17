@@ -9,7 +9,7 @@ constexpr size_t FRAMES_BUFFER_SIZE = 65536; // Buffer for reading frames
 
 int main(int argc, char *argv[]) {
 	if(argc < 4) {
-		cerr << "Usage: " << argv[0] << " <input file> <output_file> ( reverse | left | right | single_echo | double_echo | triple_echo )\n";
+		cerr << "Usage: " << argv[0] << " <input file> <output_file> ( reverse | left | right | single_echo | double_echo )\n";
 		return 1;
 	}
     
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 
     size_t nFrames;
     vector<short> samples(FRAMES_BUFFER_SIZE * sfhIn.channels());
-    vector<short> samples_out(FRAMES_BUFFER_SIZE * sfhIn.channels()*2);
+    vector<short> samples_out(FRAMES_BUFFER_SIZE * sfhIn.channels());
     int value = 0;
     while((nFrames = sfhIn.readf(samples.data(), FRAMES_BUFFER_SIZE))) {
         samples.resize(nFrames * sfhIn.channels());
@@ -74,53 +74,18 @@ int main(int argc, char *argv[]) {
             }
         } else if(effect == "single_echo") {
             for (int i = 0; i < samples.size(); i++) {
-                if (i < 44100) {
-                    samples_out[i] = samples[i];
-                } else {
-                    samples_out[i] = samples[i] + samples[i-44100];
-                }
+                samples_out[i] = (samples[i] + samples[i-44000])*0.5;
             }
         } else if(effect == "double_echo") {
             for (int i = 0; i < samples.size(); i++) {
-                if (i < 44100) {
-                    samples_out[i] = samples[i];
-                } else if (i < 88200) {
-                    samples_out[i] = samples[i] + samples[i-44100];
-                } else {
-                    samples_out[i] = samples[i] + samples[i-44100] + samples[i-88200];
-                }
+                samples_out[i] = (samples[i] + samples[i-44100] + samples[i-88200])*0.5;
             }
+        
         } else if(effect == "triple_echo") {
             for (int i = 0; i < samples.size(); i++) {
-                if (i < 44100) {
-                    samples_out[i] = samples[i];
-                } else if (i < 88200) {
-                    samples_out[i] = samples[i] + samples[i-44100];
-                } else if (i < 132300) {
-                    samples_out[i] = samples[i] + samples[i-44100] + samples[i-88200];
-                } else {
-                    samples_out[i] = samples[i] + samples[i-44100] + samples[i-88200] + samples[i-132300];
-                }
+                samples_out[i] = (samples[i] + samples[i-44100] + samples[i-88200] + samples[i-samples.size()])*0.4;
             }
-        } else if(effect == "single_echo_2") {
-            for (int i = 0; i < samples.size(); i++) {
-                if (i < 88200) {
-                    samples_out[i] = samples[i];
-                } else {
-                    samples_out[i] = samples[i] + samples[i-88200];
-                }
-            }
-        } else if(effect == "double_echo_2") {
-            for (int i = 0; i < samples.size(); i++) {
-                if (i < 88200) {
-                    samples_out[i] = samples[i];
-                } else if (i < 176400) {
-                    samples_out[i] = samples[i] + samples[i-88200];
-                } else {
-                    samples_out[i] = samples[i] + samples[i-88200] + samples[i-176400];
-                }
-            }
-        } else{
+        }else{
             cerr << "Error: invalid effect\n";
             return 1;
         }

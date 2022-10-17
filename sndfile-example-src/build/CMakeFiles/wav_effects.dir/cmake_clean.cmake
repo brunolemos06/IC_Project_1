@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "/home/bruno/Desktop/UA-LECI/4ano/IC/IC_Project_1/sndfile-example-bin/wav_effects"
-  "/home/bruno/Desktop/UA-LECI/4ano/IC/IC_Project_1/sndfile-example-bin/wav_effects.pdb"
+  "/home/bruno/Desktop/UA-ECT/4ano/IC/IC_Project_1/sndfile-example-bin/wav_effects"
+  "/home/bruno/Desktop/UA-ECT/4ano/IC/IC_Project_1/sndfile-example-bin/wav_effects.pdb"
   "CMakeFiles/wav_effects.dir/wav_effects.cpp.o"
 )
 

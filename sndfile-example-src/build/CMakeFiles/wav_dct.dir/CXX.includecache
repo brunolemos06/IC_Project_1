@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/bruno/Desktop/UA-LECI/4ano/IC/IC_Project_1/sndfile-example-src/wav_dct.cpp
+/home/bruno/Desktop/UA-ECT/4ano/IC/IC_Project_1/sndfile-example-src/wav_dct.cpp
 iostream
 -
 vector
