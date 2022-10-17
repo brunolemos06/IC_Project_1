@@ -1,63 +1,131 @@
 #include <iostream>
-#include <sndfile.hh>
 #include <vector>
-#include <cmath>
+#include <sndfile.hh>
+#include "wav_quant.h"
+
 using namespace std;
 
-constexpr size_t FRAMES_BUFFER_SIZE = 65536; // Buffer for reading/writing frames
+constexpr size_t FRAMES_BUFFER_SIZE = 65536; // Buffer for reading frames
 
 int main(int argc, char *argv[]) {
-
-    if(argc < 3) {
-		cerr << "Usage: wav_effects <orignal filename> <compressed filename>" << endl;
+	if(argc < 4) {
+		cerr << "Usage: " << argv[0] << " <input file> <output_file> ( reverse | left | right | single_echo | double_echo | triple_echo )\n";
 		return 1;
 	}
+    
+    string effect = argv[argc-1];
+	SndfileHandle sfhIn { argv[argc-3] };
 
-    SndfileHandle sfhInOG { argv[argc-2] };
-    SndfileHandle sfhInCO { argv[argc-1] };
-	if(sfhInOG.error() || sfhInCO.error()) {
-		cerr << "Error: invalid input file\n";
+	if(sfhIn.error()) {
+		cerr << "Error: invalid input file\n";  
 		return 1;
     }
 
-	if((sfhInOG.format() & SF_FORMAT_TYPEMASK) != SF_FORMAT_WAV || (sfhInCO.format() & SF_FORMAT_TYPEMASK) != SF_FORMAT_WAV) {
+	if((sfhIn.format() & SF_FORMAT_TYPEMASK) != SF_FORMAT_WAV) {
 		cerr << "Error: file is not in WAV format\n";
 		return 1;
 	}
 
-	if((sfhInOG.format() & SF_FORMAT_SUBMASK) != SF_FORMAT_PCM_16 || (sfhInCO.format() & SF_FORMAT_SUBMASK) != SF_FORMAT_PCM_16) {
+	if((sfhIn.format() & SF_FORMAT_SUBMASK) != SF_FORMAT_PCM_16) {
 		cerr << "Error: file is not in PCM_16 format\n";
 		return 1;
 	}
-
-    //files must have same number of samples
-    if((sfhInOG.samplerate() * sfhInOG.channels()) != (sfhInCO.samplerate() * sfhInCO.channels())){
-        cerr << "files do not have the same number of samples" << endl;
-        return 1;
+    SndfileHandle sfhOut { argv[argc-2], SFM_WRITE, sfhIn.format(),
+    sfhIn.channels(), sfhIn.samplerate() };
+	if(sfhOut.error()) {
+		cerr << "Error: invalid output file\n";
+		return 1;
     }
-    
-    double N = sfhInOG.samplerate() * sfhInOG.channels();
-
-
-    double D = 0;
-    double S = 0;
 
     size_t nFrames;
-    vector<short> OGsamples(FRAMES_BUFFER_SIZE * sfhInOG.channels());
-    while((nFrames = sfhInOG.readf(OGsamples.data(), FRAMES_BUFFER_SIZE))) {
-        OGsamples.resize(nFrames * sfhInOG.channels());
-    }
+    vector<short> samples(FRAMES_BUFFER_SIZE * sfhIn.channels());
+    vector<short> samples_out(FRAMES_BUFFER_SIZE * sfhIn.channels()*2);
+    int value = 0;
+    while((nFrames = sfhIn.readf(samples.data(), FRAMES_BUFFER_SIZE))) {
+        samples.resize(nFrames * sfhIn.channels());
 
-    // VARS 
-    double Ex = 0;
-    double Er = 0;
-	double SNR = 0;
-    vector<short> C0samples(FRAMES_BUFFER_SIZE * sfhInCO.channels());
-    while((nFrames = sfhInCO.readf(C0samples.data(), FRAMES_BUFFER_SIZE))) {
-        C0samples.resize(nFrames * sfhInCO.channels());
-        cout << nFrames << endl;
+        if (effect == "reverse") {
+            short aux = 0;
+            for (int i = 0; i < samples.size(); i+=1) {
+                samples_out[i] = samples[samples.size()-i-1];
+            }
+            for (int i = 0; i < samples.size(); i+=2) {
+                aux = samples_out[i];
+                samples_out[i] = samples_out[i+1];
+                samples_out[i+1] = aux;
+            }
+        } else if (effect == "left") { //LEFT
+            for (int i = 0; i < samples.size(); i++) {
+                if (value % 2 == 0) {
+                    samples_out[i] = samples[i];
+                } else {
+                    samples_out[i] = -32768;
+                }
+                value++;
+            }
+        } else if (effect == "right") {
+            for (int i = 0; i < samples.size(); i++) {
+                if (value % 2 == 0) {
+                    samples_out[i] = -32768;
+                } else {
+                    samples_out[i] = samples[i];
+                }
+                value++;
+            }
+        } else if(effect == "single_echo") {
+            for (int i = 0; i < samples.size(); i++) {
+                if (i < 44100) {
+                    samples_out[i] = samples[i];
+                } else {
+                    samples_out[i] = samples[i] + samples[i-44100];
+                }
+            }
+        } else if(effect == "double_echo") {
+            for (int i = 0; i < samples.size(); i++) {
+                if (i < 44100) {
+                    samples_out[i] = samples[i];
+                } else if (i < 88200) {
+                    samples_out[i] = samples[i] + samples[i-44100];
+                } else {
+                    samples_out[i] = samples[i] + samples[i-44100] + samples[i-88200];
+                }
+            }
+        } else if(effect == "triple_echo") {
+            for (int i = 0; i < samples.size(); i++) {
+                if (i < 44100) {
+                    samples_out[i] = samples[i];
+                } else if (i < 88200) {
+                    samples_out[i] = samples[i] + samples[i-44100];
+                } else if (i < 132300) {
+                    samples_out[i] = samples[i] + samples[i-44100] + samples[i-88200];
+                } else {
+                    samples_out[i] = samples[i] + samples[i-44100] + samples[i-88200] + samples[i-132300];
+                }
+            }
+        } else if(effect == "single_echo_2") {
+            for (int i = 0; i < samples.size(); i++) {
+                if (i < 88200) {
+                    samples_out[i] = samples[i];
+                } else {
+                    samples_out[i] = samples[i] + samples[i-88200];
+                }
+            }
+        } else if(effect == "double_echo_2") {
+            for (int i = 0; i < samples.size(); i++) {
+                if (i < 88200) {
+                    samples_out[i] = samples[i];
+                } else if (i < 176400) {
+                    samples_out[i] = samples[i] + samples[i-88200];
+                } else {
+                    samples_out[i] = samples[i] + samples[i-88200] + samples[i-176400];
+                }
+            }
+        } else{
+            cerr << "Error: invalid effect\n";
+            return 1;
+        }
+
+        sfhOut.writef(samples_out.data(), nFrames);
     }
-	
-	
-    
+    cout << "Done!\n";
 }

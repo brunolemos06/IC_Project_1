@@ -55,7 +55,4 @@ int main(int argc, char *argv[]) {
         sfhOut.writef(quant.get_quant().data(), nFrames);
     }
 
-
-
-
 }

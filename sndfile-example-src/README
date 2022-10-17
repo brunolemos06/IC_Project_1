@@ -6,4 +6,4 @@ To test:
 	../sndfile-example-bin/wav_hist sample.wav 0 // outputs the histogram of channel 0 (left)
 	../sndfile-example-bin/wav_dct sample.wav out.wav // generates a DCT "compressed" version
 	../sndfile-example-bin/wav_cmp sample.wav // prints the (SNR) of a certain audio file
-	../sndfile-example-bin/wav_effect sample.wav // produces some audio effects
+	../sndfile-example-bin/wav_effects sample.wav (reverse | left | right) // produces some audio effects
