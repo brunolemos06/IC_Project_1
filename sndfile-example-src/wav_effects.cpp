@@ -38,24 +38,24 @@ int main(int argc, char *argv[]) {
     }
 
     size_t nFrames;
+    bool flag = true;
     vector<short> samples(FRAMES_BUFFER_SIZE * sfhIn.channels());
     vector<short> samples_out(FRAMES_BUFFER_SIZE * sfhIn.channels());
     int value = 0;
-    while((nFrames = sfhIn.readf(samples.data(), FRAMES_BUFFER_SIZE))) {
-        samples.resize(nFrames * sfhIn.channels());
 
+    while((nFrames = sfhIn.readf(samples.data(), FRAMES_BUFFER_SIZE))) {
         if (effect == "reverse") {
             short aux = 0;
-            for (int i = 0; i < samples.size(); i+=1) {
+            for (size_t i = 0; i < samples.size(); i+=1) {
                 samples_out[i] = samples[samples.size()-i-1];
             }
-            for (int i = 0; i < samples.size(); i+=2) {
+            for (size_t i = 0; i < samples.size(); i+=2) {
                 aux = samples_out[i];
                 samples_out[i] = samples_out[i+1];
                 samples_out[i+1] = aux;
             }
         } else if (effect == "left") { //LEFT
-            for (int i = 0; i < samples.size(); i++) {
+            for (size_t i = 0; i < samples.size(); i++) {
                 if (value % 2 == 0) {
                     samples_out[i] = samples[i];
                 } else {
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
                 value++;
             }
         } else if (effect == "right") {
-            for (int i = 0; i < samples.size(); i++) {
+            for (size_t i = 0; i < samples.size(); i++) {
                 if (value % 2 == 0) {
                     samples_out[i] = -32768;
                 } else {
@@ -73,18 +73,30 @@ int main(int argc, char *argv[]) {
                 value++;
             }
         } else if(effect == "single_echo") {
-            for (int i = 0; i < samples.size(); i++) {
+            for (size_t i = 0; i < samples.size(); i++) {
                 samples_out[i] = (samples[i] + samples[i-44000])*0.5;
             }
         } else if(effect == "double_echo") {
-            for (int i = 0; i < samples.size(); i++) {
+            for (size_t i = 0; i < samples.size(); i++) {
                 samples_out[i] = (samples[i] + samples[i-44100] + samples[i-88200])*0.5;
             }
         
         } else if(effect == "triple_echo") {
-            for (int i = 0; i < samples.size(); i++) {
+            for (size_t i = 0; i < samples.size(); i++) {
                 samples_out[i] = (samples[i] + samples[i-44100] + samples[i-88200] + samples[i-samples.size()])*0.4;
             }
+        
+        }else if (effect == "amplitude_loop"){
+            for (size_t i = 0; i <= samples.size(); i++) {
+                samples_out[i] = (samples[i] * (double(value)/double(samples.size())));
+                if (flag == 1){
+                    value++;
+                }else{
+                    value--;
+                }
+            }
+            flag = !flag;
+
         }else{
             cerr << "Error: invalid effect\n";
             return 1;
