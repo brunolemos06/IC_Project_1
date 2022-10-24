@@ -1,86 +1,112 @@
-#ifndef BITSTREAM_H
-#define BITSTREAM_H
+  #ifndef BITSTREAM_H
+  #define BITSTREAM_H
 
-#include <iostream>
-#include <vector>
-#include <fstream>
-
-class BitStream {
-    private:
-        
-        std::vector<int> quant;
-        int bit;
-
-    public:
-        //constructor to initialize quant and initialize bit
-        BitStream( int bit){
-            this->bit = bit; 
-            quant.resize(0);
-        }
-        //function to write in a file only 1 bit
-        void write_bit(std::ofstream& file) {
-                file << bit;
-        }
-        //funtion to read 
-        void read_bit(std::ifstream& file) {
-            file >> bit;
-        }
-        //funtion to write in file N bits
-        void write_bits(std::ofstream& file, std::vector<int>& bits) {
-            for (auto& b : bits) {
-                file << b;
-            }
-        }
-        //function to read N bits from file and put them in vector quant
-        void read_bits(std::ifstream& file, size_t n) {
-            int bit;
-            for (size_t i = 0; i < n; i++) {
-                file >> bit;
-                quant[i] = bit;
-            }
-        }
-
-        // function encoder
-        //should be able to convert a text file containing only 0s and 1s into the binary equivalent (each byte
-        //of the binary file should represent eight of the bits in the text file)
-        void encode(std::ifstream& file, std::ofstream& file2) {
-            int bit;
-            std::vector<int> bits;
-            while (file >> bit) {
+  #include <iostream>
+  #include <vector>
+  #include <fstream>
+  using namespace std;
+  
+  class BitStream {
+      private:
+        fstream file;
+        char mode;
+        char buffer;
+        int count;
+  
+      public:
+        //constructor to initialize file and mode
+        BitStream(const char* filename, char mode){
+            if (mode == 'z'){
+                this->mode = mode;
+                file.open(filename, ios::in | ios::out | ios::binary);
+            }else if (mode == 'w'){
+                this->mode = mode;
+                file.open(filename, ios::out | ios::binary);
+            }else if (mode == 'r'){
+                this->mode = mode;
+                file.open(filename, ios::in | ios::binary);
+            }else{
+                cout << "Invalid mode" << endl;
+              }
+            buffer = 0;
+            count = 0;
+          }
+        //Function to read the bits from 'decoder.txt' to a vector of chars
+        vector<char> read_to_charvector(){
+            ifstream file("decoder.txt");
+            vector<char> bits;
+            //read the file and store the bits in a vector
+            char bit;
+            while (file >> bit){
                 bits.push_back(bit);
-                if (bits.size() == 8) {
-                    write_bits(file2, bits);
-                    file2 << ' ';
-                    bits.clear();
-                }
-                //if the total number of bits in the text file is not a multiple of 8, then fill the last byte with 0s
-                if (file.eof()) {
-                    //if the last byte is not full then fill it with 0s
-                    if (bits.size() != 8) {
-                        while (bits.size() != 8) {
-                            bits.push_back(0);
-                        }
-                        write_bits(file2, bits);
-                        file2 << ' ';
-                        bits.clear();
-                    }
-                }
+              }
+            //print the bits
+            for (int i = 0; i < bits.size(); i++){
+                cout << bits[i];
             }
+            file.close();
+            return bits;
+          }
+        //Function Encoder
+        void write_bit(char bit) {
+            buffer <<= 1;
+                if (bit == '1') {
+                    buffer |= 1;
+                  }
+                count++;
+                if(count == 8) {
+                    file.write(&buffer, 1);
+                    buffer = 0;
+                    count = 0;
+                }
+        }
+        //Function Encoder to N bits
+        void write_bits(const vector<char> bits) {
+            //get the & of the bits and the buffer
+            for (int i = 0; i < bits.size(); i++){
+                buffer <<= 1;
+                if (bits[i] == '1') {
+                    buffer |= 1;
+                }
+                count++;
+                if(count == 8) {
+                    file.write(&buffer, 1);
+                    buffer = 0;
+                    count = 0;
+                  }
+              }
+        }
             
-        }
-        //function decoder
-        //should be able to convert a binary file into a text file containing only 0s and 1s
-        void decode(std::ifstream& file, std::ofstream& file2) {
-            int bit;
-            std::vector<int> bits;
-            while (file >> bit) {
-                bits.push_back(bit);
-                if (bits.size() == 8) {
-                    write_bits(file2, bits);
-                    bits.clear();
-                }
-            }
-        }
-};
+            // for (auto& b : bits) { 
+            //     write_bit(b);
+            // }
+            //   }
 
-#endif 
+        //Function Decoder
+        void decoder() {
+            //read the content of the file byte by byte
+            char c;
+            file.read(&c, 1);
+            //convert the byte in a string of bits
+            string bits = "";
+            for (int i = 0; i < 8; i++) {
+                bits = (c & 1 ? "1" : "0") + bits;
+                c >>= 1;
+            }
+            //print the string of bits
+            cout << bits << endl;
+            ofstream file("decoder.txt");
+            file << bits;
+            file.close();
+        }
+
+        //function to flush the buffer
+        void flush() {
+            if (mode == 'w'){
+                while(count != 0) {
+                   write_bit('0');
+                  }
+              }
+          }
+    };
+    #endif
