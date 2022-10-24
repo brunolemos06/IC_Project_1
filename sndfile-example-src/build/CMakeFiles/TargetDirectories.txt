@@ -1,0 +1,9 @@
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/build/CMakeFiles/rebuild_cache.dir
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/build/CMakeFiles/edit_cache.dir
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/build/CMakeFiles/BitStream.dir
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/build/CMakeFiles/wav_effects.dir
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/build/CMakeFiles/wav_cmp.dir
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/build/CMakeFiles/wav_quant.dir
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/build/CMakeFiles/wav_dct.dir
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/build/CMakeFiles/wav_hist.dir
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/build/CMakeFiles/wav_cp.dir

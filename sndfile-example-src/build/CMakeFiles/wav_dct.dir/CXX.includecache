@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/BitStream.h
+iostream
+-
+vector
+-
+fstream
+-
+
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/wav_dct.cpp
+iostream
+-
+vector
+-
+cmath
+-
+fftw3.h
+-
+sndfile.hh
+-
+BitStream.h
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/BitStream.h
+

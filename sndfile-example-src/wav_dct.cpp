@@ -4,6 +4,8 @@
 #include <fftw3.h>
 #include <sndfile.hh>
 
+#include "BitStream.h"
+
 using namespace std;
 
 int main(int argc, char *argv[]) {
@@ -100,6 +102,16 @@ int main(int argc, char *argv[]) {
 				x_dct[c][n * bs + k] = x[k] / (bs << 1);
 
 		}
+
+	//write bin file with dct coefficients (higher frequencies are zero)
+	//use bit stream codificador to compress
+	//convert vector<double> to vector<char>
+	vector<char> x_int (x.begin(), x.end());
+	BitStream stream("directDCT.txt", 'w');
+	stream.write_bits(x_int);
+
+	//header com info (blocksize)
+	//use bit stream decodificador to decompress
 
 	// Inverse DCT
 	fftw_plan plan_i = fftw_plan_r2r_1d(bs, x.data(), x.data(), FFTW_REDFT01, FFTW_ESTIMATE);
