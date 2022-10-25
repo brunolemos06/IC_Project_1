@@ -47,6 +47,7 @@
             file.close();
             return bits;
           }
+        //
         //Function Encoder
         void write_bit(char bit) {
             buffer <<= 1;
@@ -76,27 +77,22 @@
                   }
               }
         }
-            
-            // for (auto& b : bits) { 
-            //     write_bit(b);
-            // }
-            //   }
-
         //Function Decoder
-        void decoder() {
-            //read the content of the file byte by byte
+        void decoder(){
+            //read the content of the file byte by byte until the end of the file
+            ofstream filew("decoder.txt",ios::in | ios::binary);
             char c;
-            file.read(&c, 1);
-            //convert the byte in a string of bits
-            string bits = "";
-            for (int i = 0; i < 8; i++) {
-                bits = (c & 1 ? "1" : "0") + bits;
-                c >>= 1;
+            while (file.read(&c, 1)){
+                //convert the byte in a string of bits
+                string bits = "";
+                for (int i = 0; i < 8; i++) {
+                    bits = (c & 1 ? "1" : "0") + bits;
+                    c >>= 1;
+                }
+                //write all the bits in a file
+                
+                filew << bits;
             }
-            //print the string of bits
-            cout << bits << endl;
-            ofstream file("decoder.txt");
-            file << bits;
             file.close();
         }
 
