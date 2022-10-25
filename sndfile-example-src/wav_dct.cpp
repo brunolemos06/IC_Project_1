@@ -4,6 +4,9 @@
 #include <fftw3.h>
 #include <sndfile.hh>
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "BitStream.h"
 
 using namespace std;
@@ -103,12 +106,27 @@ int main(int argc, char *argv[]) {
 
 		}
 
-	//write bin file with dct coefficients (higher frequencies are zero)
-	//use bit stream codificador to compress
-	//convert vector<double> to vector<char>
-	vector<char> x_int (x.begin(), x.end());
-	BitStream stream("directDCT.txt", 'w');
-	stream.write_bits(x_int);
+	//convert vector<vector<double>> to vector<int>
+	//x_dct_int[0] is the left channel
+	//x_dct_int[1] is the right channel
+	//need vector<int> for BitStream with [x_dct_int[0][0], x_dct_int[1][0], x_dct_int[0][1], x_dct_int[1][1], ...]
+	vector<vector<int>> x_dct_int(nChannels, vector<int>(nBlocks * bs));
+	vector<int> x_dct_int_1d;
+	for(size_t n = 0 ; n < nBlocks ; n++)
+		for(size_t c = 0 ; c < nChannels ; c++) {
+			for(size_t k = 0 ; k < bs ; k++){
+				x_dct_int_1d.push_back(x_dct_int[c][n * bs + k]);
+			}
+		}
+
+	//use BitStream encoder to write to file, need to convert vector<int> to vector<char>
+	BitStream bsOut("directDCT.txt", 'w');
+	char buffer[sizeof(int)*8+1];
+	vector<char> x_dct_char;
+	for (int i = 0; i < x_dct_int_1d.size(); i++) {
+		itoa(x_dct_int_1d[i], buffer, 2);
+	}
+	//bsOut.write_bits(x_dct_int);
 
 	//header com info (blocksize)
 	//use bit stream decodificador to decompress
