@@ -4,6 +4,7 @@
   #include <iostream>
   #include <vector>
   #include <fstream>
+  #include <algorithm>
   using namespace std;
   
   class BitStream {
@@ -35,15 +36,12 @@
         vector<char> read_to_charvector(){
             ifstream file("decoder.txt");
             vector<char> bits;
-            //read the file and store the bits in a vector
             char bit;
+            //read the file and store the bits in a vector but in reverse order
             while (file >> bit){
                 bits.push_back(bit);
               }
-            //print the bits
-            for (int i = 0; i < bits.size(); i++){
-                cout << bits[i];
-            }
+            
             file.close();
             return bits;
           }
@@ -77,6 +75,7 @@
                   }
               }
         }
+         //Funcao Decoder lê os bits da esquerda para a direita e escreva   
         //Function Decoder
         void decoder(){
             //read the content of the file byte by byte until the end of the file
@@ -90,7 +89,6 @@
                     c >>= 1;
                 }
                 //write all the bits in a file
-                
                 filew << bits;
             }
             file.close();
@@ -99,9 +97,9 @@
         //function to flush the buffer
         void flush() {
             if (mode == 'w'){
-                while(count != 0) {
-                   write_bit('0');
-                  }
+              file.write(&buffer, 1);
+              buffer=0;
+              count=0;
               }
           }
     };
