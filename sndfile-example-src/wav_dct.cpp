@@ -4,6 +4,10 @@
 #include <fftw3.h>
 #include <sndfile.hh>
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <bitset>
+
 #include "BitStream.h"
 
 using namespace std;
@@ -103,14 +107,48 @@ int main(int argc, char *argv[]) {
 
 		}
 
-	//write bin file with dct coefficients (higher frequencies are zero)
-	//use bit stream codificador to compress
-	//convert vector<double> to vector<char>
-	vector<char> x_int (x.begin(), x.end());
-	BitStream stream("directDCT.txt", 'w');
-	stream.write_bits(x_int);
+	//convert vector<vector<double>> to vector<int>
+	//x_dct_int[0] is the left channel
+	//x_dct_int[1] is the right channel
+	//need vector<int> with [x_dct_int[0][0], x_dct_int[1][0], x_dct_int[0][1], x_dct_int[1][1], ...]
+	vector<int> x_dct_int;
+	int min_value = 0, max_value = 0;
+	for(size_t n = 0 ; n < nBlocks ; n++)
+		for(size_t c = 0 ; c < nChannels ; c++) {
+			x_dct_int.push_back(x_dct[c][n]);
+			if(x_dct[c][n] < min_value){
+				min_value = x_dct[c][n];
+			}
+			if(x_dct[c][n] > max_value){
+				max_value = x_dct[c][n];
+			}
+		}
 
-	//header com info (blocksize)
+	//print min and max value and bits needed to represent them
+	cout << "min_value: " << min_value << endl;
+	cout << bitset<13>(min_value) << "\n";
+	cout << "bits needed to represent min_value: " << ceil(log2(abs(min_value))) << endl;
+	cout << "max_value: " << max_value << endl;
+	cout << bitset<13>(max_value) << "\n";
+	cout << "bits needed to represent max_value: " << ceil(log2(max_value)) << endl;
+	//needed 12 bits so represent the max and min values
+
+	//use BitStream encoder to write to file, need to convert vector<int> to vector<char>
+	vector<char> x_dct_char;
+	for(int i = 0; i < x_dct_int.size(); i++){
+		bitset<13> tmp(x_dct_int[i]);
+		cout << "ORIGINAL:	" << tmp.to_string() << endl;
+		//iterate through the bitset (start at the end) and add each char to the vector
+		cout << "ADDED:	";
+		for(int j = 12; j >= 0; j--){
+			x_dct_char.push_back(tmp[j]);
+			cout <<tmp[j];
+		}		
+		cout << endl;
+	}
+	BitStream bsOut("directDCT.txt", 'w');
+	//bsOut.write_bits(x_dct_char, 13); //adicionar arg para o numero de bits por valor
+	
 	//use bit stream decodificador to decompress
 
 	// Inverse DCT
