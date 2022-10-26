@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/bruno/Desktop/UA-ECT/4ano/IC/IC_Project_1/sndfile-example-src/wav_hist.cpp
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/wav_hist.cpp
 iostream
 -
 vector
@@ -14,9 +14,9 @@ vector
 sndfile.hh
 -
 wav_hist.h
-/home/bruno/Desktop/UA-ECT/4ano/IC/IC_Project_1/sndfile-example-src/wav_hist.h
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/wav_hist.h
 
-/home/bruno/Desktop/UA-ECT/4ano/IC/IC_Project_1/sndfile-example-src/wav_hist.h
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/wav_hist.h
 fstream
 -
 iostream

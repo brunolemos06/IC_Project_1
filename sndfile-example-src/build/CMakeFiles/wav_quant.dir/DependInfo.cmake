@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/bruno/Desktop/UA-ECT/4ano/IC/IC_Project_1/sndfile-example-src/wav_quant.cpp" "/home/bruno/Desktop/UA-ECT/4ano/IC/IC_Project_1/sndfile-example-src/build/CMakeFiles/wav_quant.dir/wav_quant.cpp.o"
+  "/home/tiago/Desktop/IC_Project_1/sndfile-example-src/wav_quant.cpp" "/home/tiago/Desktop/IC_Project_1/sndfile-example-src/build/CMakeFiles/wav_quant.dir/wav_quant.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

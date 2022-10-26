@@ -45,6 +45,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
+  "CMakeFiles/BitStream.dir/DependInfo.cmake"
   "CMakeFiles/wav_effects.dir/DependInfo.cmake"
   "CMakeFiles/wav_cmp.dir/DependInfo.cmake"
   "CMakeFiles/wav_quant.dir/DependInfo.cmake"

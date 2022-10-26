@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/bruno/Desktop/UA-ECT/4ano/IC/IC_Project_1/sndfile-example-src/wav_quant.cpp
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/wav_quant.cpp
 iostream
 -
 vector
@@ -14,9 +14,9 @@ vector
 sndfile.hh
 -
 wav_quant.h
-/home/bruno/Desktop/UA-ECT/4ano/IC/IC_Project_1/sndfile-example-src/wav_quant.h
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/wav_quant.h
 
-/home/bruno/Desktop/UA-ECT/4ano/IC/IC_Project_1/sndfile-example-src/wav_quant.h
+/home/tiago/Desktop/IC_Project_1/sndfile-example-src/wav_quant.h
 iostream
 -
 vector
