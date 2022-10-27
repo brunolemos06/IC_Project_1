@@ -8,4 +8,4 @@ To test:
 	../sndfile-example-bin/wav_cmp sample.wav out.wav	// prints the (SNR) of a certain audio file
 	../sndfile-example-bin/wav_effects sample.wav out.wav ( reverse | left | right | single-echo | double_echo | triple_echo | amplitude_loop) // produces some audio effects
 	../sndfile-example-bin/wav_quant sample.wav <bits_to cut> out.wav	//outputs quantized sound version
-	
+	../sndfile-example-bin/Bitstream			// read and write bits from the file
