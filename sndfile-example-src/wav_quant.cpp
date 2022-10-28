@@ -10,7 +10,7 @@ constexpr size_t FRAMES_BUFFER_SIZE = 65536; // Buffer for reading frames
 int main(int argc, char *argv[]) {
 
 	if(argc < 4) {
-		cerr << "Usage: " << argv[0] << " <input file> <bit_cut> <output_file>\n";
+		cerr << "Usage: " << argv[0] << " <input file> <output_file> <bit_cut>\n";
 		return 1;
 	}
 
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-    SndfileHandle sfhOut { argv[argc-1], SFM_WRITE, sfhIn.format(),
+    SndfileHandle sfhOut { argv[argc-2], SFM_WRITE, sfhIn.format(),
     sfhIn.channels(), sfhIn.samplerate() };
 	if(sfhOut.error()) {
 		cerr << "Error: invalid output file\n";
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     }
 
 
-    int bit_cut { stoi(argv[argc-2]) };
+    int bit_cut { stoi(argv[argc-1]) };
 
     if(bit_cut < 1 || bit_cut > 15) {
         cerr << "Error: invalid number of bits to cut\n";
