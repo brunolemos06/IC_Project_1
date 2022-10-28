@@ -32,51 +32,7 @@
             buffer = 0;
             count = 0;
           }
-        //Function to read the bits from 'decoder.txt' to a vector of chars
-        vector<char> read_to_charvector(){
-            ifstream file("decoder.txt");
-            vector<char> bits;
-            char bit;
-            //read the file and store the bits in a vector but in reverse order
-            while (file >> bit){
-                bits.push_back(bit);
-              }
-            
-            file.close();
-            return bits;
-          }
-        //
-        //Function Encoder
-        void write_bit(char bit) {
-            buffer <<= 1;
-                if (bit == '1') {
-                    buffer |= 1;
-                  }
-                count++;
-                if(count == 8) {
-                    file.write(&buffer, 1);
-                    buffer = 0;
-                    count = 0;
-                }
-        }
-        //Function Encoder to N bits
-        void write_bits(const vector<char> bits) {
-            //get the & of the bits and the buffer
-            for (int i = 0; i < bits.size(); i++){
-                buffer <<= 1;
-                if (bits[i] == '1') {
-                    buffer |= 1;
-                }
-                count++;
-                if(count == 8) {
-                    file.write(&buffer, 1);
-                    buffer = 0;
-                    count = 0;
-                  }
-              }
-        }
-         //Funcao Decoder lê os bits da esquerda para a direita e escreva   
-        //Function Decoder
+          //Function Decoder
         void decoder(){
             //read the content of the file byte by byte until the end of the file
             ofstream filew("decoder.txt",ios::in | ios::binary);
@@ -93,13 +49,62 @@
             }
             file.close();
         }
+        
+        //Function Encoder
+        void write_bit(char bit) {
+            buffer <<= 1;
+                if (bit == '1') {
+                    buffer |= 1;
+                  }
+                count++;
+                if(count == 8) {
+                    file.write(&buffer, 1);
+                    buffer = 0;
+                    count = 0;
+                }
+        }
+        //Function Encoder to N bits
+        void write_bits(const char* filename,int n) {
+            ifstream filew(filename);
+            vector<char> bits;
+            char bit;
+            //read the file and store the bits in a vector but in reverse order
+            while (filew >> bit){
+                bits.push_back(bit);
+              }
+            
+            filew.close();
+            //get the & of the bits and the buffer
+            for (int i = 0; i < bits.size(); i++){
+                buffer <<= 1;
+                if (bits[i] == '1') {
+                    buffer |= 1;
+                }
+                count++;
+                if(count == n) {
+                    file.write(&buffer, 1);
+                    buffer = 0;
+                    count = 0;
+                  }
+              }
+            flushr();
+        }
+        
 
         //function to flush the buffer
-        void flush() {
+        void flushl() {
             if (mode == 'w'){
               file.write(&buffer, 1);
               buffer=0;
               count=0;
+              }
+          }
+        //function to to flush the buffer filling it with zeros
+        void flushr() {
+            if (mode == 'w'){
+                while(count != 0) {
+                   write_bit('0');
+                  }
               }
           }
     };
