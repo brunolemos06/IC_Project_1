@@ -12,6 +12,8 @@
 
 using namespace std;
 
+string findTwoscomplement(string str); //translates a binary string to its two's complement
+
 int main(int argc, char *argv[]) {
 
 	bool verbose { false };
@@ -126,13 +128,13 @@ int main(int argc, char *argv[]) {
 		}
 
 	//print min and max value and bits needed to represent them
-	cout << "min_value: " << min_value << endl;
-	cout << "bits needed to represent min_value: " << ceil(log2(abs(min_value))) << endl;
-	cout << "max_value: " << max_value << endl;
-	cout << "bits needed to represent max_value: " << ceil(log2(max_value)) << endl;
-	cout << "bits needded to represent [min_value, max_value]: " << ((ceil(log2(abs(min_value)))>ceil(log2(max_value))) ? ceil(log2(abs(min_value)))+1 : ceil(log2(max_value))+1) << endl;
-	cout << "max bin: " << bitset<13>(max_value) << "\n";
-	cout << "min bin: " << bitset<13>(min_value) << "\n";
+	// cout << "min_value: " << min_value << endl;
+	// cout << "bits needed to represent min_value: " << ceil(log2(abs(min_value))) << endl;
+	// cout << "max_value: " << max_value << endl;
+	// cout << "bits needed to represent max_value: " << ceil(log2(max_value)) << endl;
+	// cout << "bits needded to represent [min_value, max_value]: " << ((ceil(log2(abs(min_value)))>ceil(log2(max_value))) ? ceil(log2(abs(min_value)))+1 : ceil(log2(max_value))+1) << endl;
+	// cout << "max bin: " << bitset<13>(max_value) << "\n";
+	// cout << "min bin: " << bitset<13>(min_value) << "\n";
 	//needed 13 bits so represent the max and min values
 
 	//use BitStream encoder to write to file, need to convert vector<int> to vector<char>
@@ -151,12 +153,87 @@ int main(int argc, char *argv[]) {
 		//cout << endl;
 	}
 
-	BitStream bsOut("directDCT.txt", 'w');
-	bsOut.write_bits(x_dct_char);
+	//write x_dc_char to file
+	ofstream outfile;
+	outfile.open("directDCT.txt", ios::out | ios::binary);
+	for(size_t i = 0; i < x_dct_char.size(); i++){
+		outfile << x_dct_char[i];
+	}
+	outfile.close();
+
+	//read DCT values and encode them
+	cout << "Reading DCT values from file..." << endl;
+	BitStream bsOut("directDCT.txt", 'r');	//read from file
+	bsOut.encoder("encodedDCT.txt", 8);		//encode bin to chars
 	
-	//use bit stream decodificador to decompress
+	//read encoded DCT values and decode it
+	cout << "Reading encoded DCT values from file..." << endl;
+	BitStream bsIn("encodedDCT.txt", 'r');	//read encoded data from file
+	bsIn.decoder("decodedDCT.txt");			//decode chars to bin
+
+	//read decoded DCT values and convert it to vector<int>
+	cout << "Reading decoded DCT values from file..." << endl;
+	ifstream infile;
+	infile.open("decodedDCT.txt", ios::in | ios::binary);
+	vector<int> x_dct_int_decoded;
+	while(!infile.eof()){
+		//read 13 bits at a time and convert to int
+		string tmp_str;
+		for(size_t i = 0; i < 13; i++){
+			char tmp_char;
+			infile >> tmp_char;
+			tmp_str += tmp_char;
+		}
+		//cout << "TMP STR: "<< tmp_str << endl;
+		int tmp_int;
+		//if string starts with 1, then it is negative
+		if(tmp_str[0] == '1'){
+			tmp_str = findTwoscomplement(tmp_str);
+			//string to int and negate
+			tmp_int = -(stoi(tmp_str, nullptr, 2));
+		}
+		else{
+			//string to int
+			tmp_int = stoi(tmp_str, nullptr, 2);
+		}
+		//cout << "VALUE:	"<< tmp_int << endl;
+		//cout << "----------------------------------------" << endl;
+		x_dct_int_decoded.push_back(tmp_int);
+	}
+
+	//compare x_dct_int and x_dct_int_decoded
+	cout << "Comparing original and decoded DCT values..." << endl;
+	for(size_t i = 0; i < x_dct_int.size(); i++){
+		if(x_dct_int[i] != x_dct_int_decoded[i]){
+			cout << "ERROR: original and decoded DCT values do not match" << endl;
+			return 0;
+		}
+	}
+	cout << "SUCCESS: original and decoded DCT values match" << endl;
+
+	//convert x_dct_int_decoded to vector<vector<double>>
+	//vector<vector<double>> has the same structure as x_dct
+	vector<vector<double>> x_dct_decoded(nChannels, vector<double>(nBlocks * bs));
+	for(size_t b = 0; b < nBlocks; b++){
+		for(size_t c = 0; c < nChannels; c++){
+			x_dct_decoded[c][b] = x_dct_int_decoded[c + b*nChannels];
+		}
+	}
+
+	//compare x_dct and x_dct_decoded
+	cout << "Checking structure transformation" << endl;
+	for(size_t c = 0; c < nChannels; c++){
+		for(size_t n = 0; n < bs; n++){
+			if((int)x_dct[c][n] != x_dct_decoded[c][n]){
+				cout << "ERROR: x_dct and x_dct_decoded do not match" << endl;
+			}
+		}
+	}
+	cout << "SUCCESS: vector<int> to vector<vector<double>>" << endl;
 
 	// Inverse DCT
+	cout << "Inverse DCT..." << endl;
+	vector<double> x_idct(bs);
 	fftw_plan plan_i = fftw_plan_r2r_1d(bs, x.data(), x.data(), FFTW_REDFT01, FFTW_ESTIMATE);
 	for(size_t n = 0 ; n < nBlocks ; n++)
 		for(size_t c = 0 ; c < nChannels ; c++) {
@@ -171,5 +248,36 @@ int main(int argc, char *argv[]) {
 
 	sfhOut.writef(samples.data(), sfhIn.frames());
 	return 0;
+}
+
+string findTwoscomplement(string str)
+{
+    int n = str.length();
+ 
+    // Traverse the string to get first '1' from
+    // the last of string
+    int i;
+    for (i = n-1 ; i >= 0 ; i--)
+        if (str[i] == '1')
+            break;
+ 
+    // If there exists no '1' concatenate 1 at the
+    // starting of string
+    if (i == -1)
+        return '1' + str;
+ 
+    // Continue traversal after the position of
+    // first '1'
+    for (int k = i-1 ; k >= 0; k--)
+    {
+        //Just flip the values
+        if (str[k] == '1')
+            str[k] = '0';
+        else
+            str[k] = '1';
+    }
+ 
+    // return the modified string
+    return str;
 }
 

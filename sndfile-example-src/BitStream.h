@@ -5,6 +5,7 @@
   #include <vector>
   #include <fstream>
   #include <algorithm>
+  #include <bits/stdc++.h>
   using namespace std;
   
   class BitStream {
@@ -32,25 +33,63 @@
             buffer = 0;
             count = 0;
           }
-          //Function Decoder
-        void decoder(){
+          
+        
+        //Function readbit
+        void readbit(){
             //read the content of the file byte by byte until the end of the file
             ofstream filew("decoder.txt",ios::in | ios::binary);
             char c;
-            while (file.read(&c, 1)){
-                //convert the byte in a string of bits
-                string bits = "";
-                for (int i = 0; i < 8; i++) {
-                    bits = (c & 1 ? "1" : "0") + bits;
-                    c >>= 1;
-                }
-                //write all the bits in a file
-                filew << bits;
-            }
+            //read only the first byte of the file
+            file.read(&c, 1);
+            //convert the byte to binary
+            string binary = bitset<8>(c).to_string();
+            //write only the first bit of the byte
+            filew << binary[1];
+            //write the byte
+            // filew << binary;
             file.close();
         }
+
+        //Function readNbits
+        void readNbits(int n){
+            //read the content of the file byte by byte until the end of the file
+            ofstream filew("decoder.txt",ios::in | ios::binary);
+            char c;
+            int nbytes = ceil(n/8.0);
+            int excess = n%8;
+            for (size_t i = 0; i < nbytes; i++){
+                file.read(&c, 1);
+                string binary = bitset<8>(c).to_string();
+                //if the excess is not zero and it is the last byte to be read then read only the excess bits of the byte
+                if (excess != 0 && i == nbytes-1){
+                    string binary = bitset<8>(c).to_string();
+                    for (int j = 0; j < excess; j++){
+                        filew << binary[j];
+                    }
+                }else{
+                    string binary = bitset<8>(c).to_string();
+                    filew << binary;
+                }
+            }
+        }
         
-        //Function Encoder
+        void writebit(const char* filename) {
+          //read the first char of the file and set the bit with the value of the char
+          ifstream filer(filename, ios::in | ios::binary);
+          char bit;
+          filer.read(&bit, 1);
+            buffer <<= 1;
+                if (bit == '1') {
+                    buffer |= 1;
+                  }
+                count++;
+                if(count == 8) {
+                    file.write(&buffer, 1);
+                    buffer = 0;
+                    count = 0;
+                }
+        }
         void write_bit(char bit) {
             buffer <<= 1;
                 if (bit == '1') {
@@ -64,16 +103,17 @@
                 }
         }
         //Function Encoder to N bits
-        void write_bits(const char* filename,int n) {
-            ifstream filew(filename);
+        void writeNbits(const char* filename,int n) {
+            ofstream filew(filename, ios::out | ios::binary);
             vector<char> bits;
             char bit;
             //read the file and store the bits in a vector but in reverse order
-            while (filew >> bit){
+            while (file >> bit){
                 bits.push_back(bit);
               }
-            
-            filew.close();
+
+            file.close(); 
+
             //get the & of the bits and the buffer
             for (int i = 0; i < bits.size(); i++){
                 buffer <<= 1;
@@ -82,18 +122,43 @@
                 }
                 count++;
                 if(count == n) {
-                    file.write(&buffer, 1);
+                    //print the buffer
+                    //cout << "BUFFER VAL: "<< buffer << endl;
+                    filew.write(&buffer, 1);
                     buffer = 0;
                     count = 0;
                   }
-              }
-            flushr();
+            }
+            filew.close();
+
         }
-        
+        //Function Decoder
+        void decoder(const char* filename){
+            //read the content of the file byte by byte until the end of the file
+            ofstream filew(filename,ios::out | ios::binary);
+            char c;
+            //read the bits that are stored in the file
+            while (file.get(c)){
+                //convert the char to int
+                int x = (int)c;
+                string s = bitset<8>(x).to_string();
+                filew << s;
+            }
+            file.close();
+        }
+
+        //Function Encoder
+        void encoder(const char* filename, int n){
+            writeNbits(filename, n);
+            flushl();
+        }
 
         //function to flush the buffer
         void flushl() {
             if (mode == 'w'){
+                if(count == 0) {
+                    return;
+                }
               file.write(&buffer, 1);
               buffer=0;
               count=0;
