@@ -20,7 +20,7 @@ int main() {
     //alternative way to write 1 bit
     //for loop to write 1 bit
     for (int i = 0; i < 8; i++){
-        bs.writebit();
+        bs.writebit("decoder.txt");
     }
 
     //Lê os caracters do decoder.txt e escreve os bits lidos no test.txt

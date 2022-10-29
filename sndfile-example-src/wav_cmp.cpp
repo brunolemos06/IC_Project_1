@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
         OGsamples.resize(nFramesOG * sfhInOG.channels());
         COsamples.resize(nFramesOG * sfhInCO.channels());
         //iterate samples
-        for(int i = 0; i< OGsamples.size(); ++i){
+        for(size_t i = 0; i< OGsamples.size(); ++i){
             D += pow(OGsamples[i]-COsamples[i], 2);
             S += pow(OGsamples[i], 2);
             tmpError = abs(OGsamples[i] - COsamples[i]);
@@ -67,6 +67,6 @@ int main(int argc, char *argv[]) {
 
     //Calculating SNR (expressed in dB)
     double SNR = 10*log10(S/D);
-    cout << "\033[1;34mSNR: " << SNR << " dB\nMaximum per sample absolute error: " << maxError << "\033[0m" << endl;
+    cout << "SNR: " << SNR << " dB\nMaximum per sample absolute error: " << maxError << endl;
 
 }
