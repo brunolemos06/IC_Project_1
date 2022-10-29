@@ -55,21 +55,11 @@ int main(int argc, char *argv[]) {
             }
         } else if (effect == "left") { //LEFT
             for (size_t i = 0; i < samples.size(); i++) {
-                if (value % 2 == 0) {
-                    samples_out.push_back(samples[i]);
-                } else {
-                    samples_out.push_back(-32768);
-                }
-                value++;
+                samples_out_echo[i] = (++value % 2) * samples[i];
             }
-        } else if (effect == "right") {
+        } else if (effect == "right") { //RIGHT
             for (size_t i = 0; i < samples.size(); i++) {
-                if (value % 2 == 0) {
-                    samples_out.push_back(-32768);
-                } else {
-                    samples_out.push_back(samples[i]);
-                }
-                value++;
+                samples_out_echo[i] = (value++ % 2) * samples[i];
             }
         } else if(effect == "single_echo") {
             for (size_t i = 0; i < samples.size(); i++) {
@@ -77,12 +67,12 @@ int main(int argc, char *argv[]) {
             }
         } else if(effect == "double_echo") {
             for (size_t i = 0; i < samples.size(); i++) {
-                samples_out_echo[i] = (samples[i] + samples[i-44100] + samples[i-88200])*0.5;
+                samples_out_echo[i] = (samples[i] + samples[i-44100] + samples[i-88200])*0.4;
             }
         
         } else if(effect == "triple_echo") {
             for (size_t i = 0; i < samples.size(); i++) {
-                samples_out_echo[i] = (samples[i] + samples[i-44100] + samples[i-88200] + samples[i-samples.size()])*0.4;
+                samples_out_echo[i] = (samples[i] + samples[i-44100] + samples[i-88200] + samples[i-132300])*0.2;
             }
         }else if (effect == "amplitude_loop"){
             cout << "Amplitude Loop...\n";
@@ -100,30 +90,14 @@ int main(int argc, char *argv[]) {
             cerr << "Error: invalid effect\n";
             return 1;
         }
-        if (effect == "single_echo" || effect == "double_echo" || effect == "triple_echo"){
+        if (effect == "single_echo" || effect == "double_echo" || effect == "triple_echo" || effect == "left" || effect == "right") {
             sfhOut.writef(samples_out_echo.data(), nFrames);
         }
     }
 
-    if (effect == "single_echo" || effect == "double_echo" || effect == "triple_echo"){
-        cout << "Done!\n";
-        return 1;
-    }
-    // reverse samples_out
-    else if (effect == "reverse"){
-        // reverse samples_out in group of 2
-        std::reverse(samples_out.begin(), samples_out.end());
-        for (size_t i = 0; i < samples_out.size(); i+=2 ) {
-            short aux = samples_out[i];
-            samples_out[i] = samples_out[i+1];
-            samples_out[i+1] = aux;
+        if (effect != "reverse"){
+            sfhOut.writef(samples_out.data(), FRAMES_BUFFER_SIZE*i);
         }
-        cout << samples_out.size() << endl;
-        sfhOut.writef(samples_out.data(),FRAMES_BUFFER_SIZE*i);
-
-    }else if (effect != "reverse"){
-        sfhOut.writef(samples_out.data(), FRAMES_BUFFER_SIZE*i);
-    }
 
     cout << "Done!\n";
 }
