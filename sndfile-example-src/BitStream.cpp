@@ -9,17 +9,6 @@ using namespace std;
 int main() {
     //test the class BitStream
     BitStream bs("test.txt", 'w');
-    //read the bits from the file and store them in a vector
-    //print the bits
-    // vector<char> bits = {'0', '0', '1', '0', '0', '0', '1', '1'};
-    // bs.write_bits(bs.read_to_charvector());
-    bs.write_bits(bs.read_to_charvector());
-    // bs.read_to_charvector();
-    // bs.write_bits(bits);
-    // bs.write_bit('1');
-    
-    //print the output of read_bit
+    bs.write_bits("decoder.txt",8);
     // bs.decoder();
-    bs.flush();
-
 }

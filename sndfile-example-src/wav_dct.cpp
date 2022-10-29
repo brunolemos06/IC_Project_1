@@ -116,38 +116,43 @@ int main(int argc, char *argv[]) {
 	for(size_t n = 0 ; n < nBlocks ; n++)
 		for(size_t c = 0 ; c < nChannels ; c++) {
 			x_dct_int.push_back(x_dct[c][n]);
-			if(x_dct[c][n] < min_value){
+			//cout << "DOUBLE:"<< x_dct[c][n] << "			INT:" << (int)x_dct[c][n]<<"				SHORT:"<<(short)x_dct[c][n]<< endl;
+			if((int)x_dct[c][n] < min_value){
 				min_value = x_dct[c][n];
 			}
-			if(x_dct[c][n] > max_value){
+			if((int)x_dct[c][n] > max_value){
 				max_value = x_dct[c][n];
 			}
 		}
 
 	//print min and max value and bits needed to represent them
 	cout << "min_value: " << min_value << endl;
-	cout << bitset<13>(min_value) << "\n";
 	cout << "bits needed to represent min_value: " << ceil(log2(abs(min_value))) << endl;
 	cout << "max_value: " << max_value << endl;
-	cout << bitset<13>(max_value) << "\n";
 	cout << "bits needed to represent max_value: " << ceil(log2(max_value)) << endl;
-	//needed 12 bits so represent the max and min values
+	cout << "bits needded to represent [min_value, max_value]: " << ((ceil(log2(abs(min_value)))>ceil(log2(max_value))) ? ceil(log2(abs(min_value)))+1 : ceil(log2(max_value))+1) << endl;
+	cout << "max bin: " << bitset<13>(max_value) << "\n";
+	cout << "min bin: " << bitset<13>(min_value) << "\n";
+	//needed 13 bits so represent the max and min values
 
 	//use BitStream encoder to write to file, need to convert vector<int> to vector<char>
 	vector<char> x_dct_char;
-	for(int i = 0; i < x_dct_int.size(); i++){
+	for(size_t i = 0; i < x_dct_int.size(); i++){
 		bitset<13> tmp(x_dct_int[i]);
-		cout << "ORIGINAL:	" << tmp.to_string() << endl;
-		//iterate through the bitset (start at the end) and add each char to the vector
-		cout << "ADDED:	";
-		for(int j = 12; j >= 0; j--){
-			x_dct_char.push_back(tmp[j]);
-			cout <<tmp[j];
-		}		
-		cout << endl;
+		string tmp_str = tmp.to_string();
+		//cout << "ORIGINAL INT:	" << x_dct_int[i] << endl;
+		//cout << "ORIGINAL BIN:	" << tmp_str << endl;
+		//iterate through the bitset and add each char to the vector
+		//cout << "ADDED:	";
+		for(size_t j = 0; j < tmp_str.size(); j++){
+			x_dct_char.push_back(tmp_str[j]);
+			//cout << tmp_str[j];
+		}
+		//cout << endl;
 	}
+
 	BitStream bsOut("directDCT.txt", 'w');
-	//bsOut.write_bits(x_dct_char, 13); //adicionar arg para o numero de bits por valor
+	bsOut.write_bits(x_dct_char);
 	
 	//use bit stream decodificador to decompress
 
