@@ -128,19 +128,20 @@ int main(int argc, char *argv[]) {
 		}
 
 	//print min and max value and bits needed to represent them
-	// cout << "min_value: " << min_value << endl;
-	// cout << "bits needed to represent min_value: " << ceil(log2(abs(min_value))) << endl;
-	// cout << "max_value: " << max_value << endl;
-	// cout << "bits needed to represent max_value: " << ceil(log2(max_value)) << endl;
-	// cout << "bits needded to represent [min_value, max_value]: " << ((ceil(log2(abs(min_value)))>ceil(log2(max_value))) ? ceil(log2(abs(min_value)))+1 : ceil(log2(max_value))+1) << endl;
-	// cout << "max bin: " << bitset<13>(max_value) << "\n";
-	// cout << "min bin: " << bitset<13>(min_value) << "\n";
+	cout << "min_value: " << min_value << endl;
+	cout << "bits needed to represent min_value: " << ceil(log2(abs(min_value))) << endl;
+	cout << "max_value: " << max_value << endl;
+	cout << "bits needed to represent max_value: " << ceil(log2(max_value)) << endl;
+	cout << "bits needded to represent [min_value, max_value]: " << ((ceil(log2(abs(min_value)))>ceil(log2(max_value))) ? ceil(log2(abs(min_value)))+1 : ceil(log2(max_value))+1) << endl;
+	cout << "max bin: " << bitset<13>(max_value) << "\n";
+	cout << "min bin: " << bitset<13>(min_value) << "\n";
 	//needed 13 bits so represent the max and min values
+	const ulong n_bits = 13;
 
 	//use BitStream encoder to write to file, need to convert vector<int> to vector<char>
 	vector<char> x_dct_char;
 	for(size_t i = 0; i < x_dct_int.size(); i++){
-		bitset<13> tmp(x_dct_int[i]);
+		bitset<n_bits> tmp(x_dct_int[i]);
 		string tmp_str = tmp.to_string();
 		//cout << "ORIGINAL INT:	" << x_dct_int[i] << endl;
 		//cout << "ORIGINAL BIN:	" << tmp_str << endl;
@@ -179,7 +180,7 @@ int main(int argc, char *argv[]) {
 	while(!infile.eof()){
 		//read 13 bits at a time and convert to int
 		string tmp_str;
-		for(size_t i = 0; i < 13; i++){
+		for(size_t i = 0; i < n_bits; i++){
 			char tmp_char;
 			infile >> tmp_char;
 			tmp_str += tmp_char;
