@@ -85,7 +85,6 @@ int main(int argc, char *argv[]) {
                 }
             }
             flag = !flag;
-
         }else{
             cerr << "Error: invalid effect\n";
             return 1;
