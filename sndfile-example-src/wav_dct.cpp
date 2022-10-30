@@ -128,13 +128,13 @@ int main(int argc, char *argv[]) {
 		}
 
 	//print min and max value and bits needed to represent them
-	// cout << "min_value: " << min_value << endl;
-	// cout << "bits needed to represent min_value: " << ceil(log2(abs(min_value))) << endl;
-	// cout << "max_value: " << max_value << endl;
-	// cout << "bits needed to represent max_value: " << ceil(log2(max_value)) << endl;
-	// cout << "bits needded to represent [min_value, max_value]: " << ((ceil(log2(abs(min_value)))>ceil(log2(max_value))) ? ceil(log2(abs(min_value)))+1 : ceil(log2(max_value))+1) << endl;
-	// cout << "max bin: " << bitset<13>(max_value) << "\n";
-	// cout << "min bin: " << bitset<13>(min_value) << "\n";
+	cout << "min_value: " << min_value << endl;
+	cout << "bits needed to represent min_value: " << ceil(log2(abs(min_value))) << endl;
+	cout << "max_value: " << max_value << endl;
+	cout << "bits needed to represent max_value: " << ceil(log2(max_value)) << endl;
+	cout << "bits needded to represent [min_value, max_value]: " << ((ceil(log2(abs(min_value)))>ceil(log2(max_value))) ? ceil(log2(abs(min_value)))+1 : ceil(log2(max_value))+1) << endl;
+	cout << "max bin: " << bitset<13>(max_value) << "\n";
+	cout << "min bin: " << bitset<13>(min_value) << "\n";
 	//needed 13 bits so represent the max and min values
 	const ulong n_bits = 13;
 
